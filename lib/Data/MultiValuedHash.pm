@@ -1,6 +1,6 @@
 =head1 NAME
 
-Data::MultiValuedHash - Hash whose keys can have multiple ordered values.
+Data::MultiValuedHash - Hash whose keys have multiple ordered values
 
 =cut
 
@@ -9,15 +9,18 @@ Data::MultiValuedHash - Hash whose keys can have multiple ordered values.
 package Data::MultiValuedHash;
 require 5.004;
 
-# Copyright (c) 1999-2002, Darren R. Duncan. All rights reserved. This module is
-# free software; you can redistribute it and/or modify it under the same terms as
-# Perl itself.  However, I do request that this copyright information remain
-# attached to the file.  If you modify this module and redistribute a changed
-# version then please attach a note listing the modifications.
+# Copyright (c) 1999-2003, Darren R. Duncan.  All rights reserved.  This module
+# is free software; you can redistribute it and/or modify it under the same terms
+# as Perl itself.  However, I do request that this copyright information and
+# credits remain attached to the file.  If you modify this module and
+# redistribute a changed version then please attach a note listing the
+# modifications.  This module is available "as-is" and the author can not be held
+# accountable for any problems resulting from its use.
 
 use strict;
+use warnings;
 use vars qw($VERSION);
-$VERSION = '1.08';
+$VERSION = '1.081';
 
 ######################################################################
 
@@ -48,63 +51,63 @@ $VERSION = '1.08';
 		siblings => ['Laura', 'Andrew', 'Julia'],
 		pets => ['Cat', 'Bird'],
 	} );  # make new with initial values, case-sensitive keys
-	
+
 	$mvh->store( age => 18 );  # celebrate a birthday
-	
+
 	$mvh->push( siblings => 'Tandy' );  # add a family member, returns 4
-	
+
 	$mvh->unshift( pets => ['Dog', 'Hamster'] );  # more pets
-	
+
 	$does_it = $mvh->exists( 'color' );  # returns true
-	
+
 	$name = $mvh->fetch_value( 'siblings' );  # returns 'Laura'
 	$name = $mvh->fetch_value( 'siblings', 2 );  # returns 'Julia'
 	$name = $mvh->fetch_value( 'siblings', -1 );  # returns 'Tandy'
 	$rname = $mvh->fetch( 'siblings' );  # returns all 4 in array ref
 	@names = $mvh->fetch( 'siblings' );  # returns all 4 as list
-	
+
 	$name = $mvh->fetch_value( 'Siblings' );  # returns nothing, wrong case
 	$mv2 = Data::MultiValuedHash->new( 1, $mvh );  # conv to case inse
 	$name = $mv2->fetch_value( 'Siblings' );  # returns 'Laura' this time
 	$is_it = $mvh->ignores_case();  # returns false; like normal hashes
 	$is_it = $mv2->ignores_case();  # returns true
-	
+
 	$color = $mvh->shift( 'color' );  # returns 'green'; none remain
-	
+
 	$animal = $mvh->pop( 'pets' );  # returns 'Bird'; three remain
-	
+
 	%list = $mvh->fetch_all();  # want all keys, all values
 		# returns ( name => ['John'], age => [18], color => [], 
 		# siblings => ['Laura', 'Andrew', 'Julia', 'Tandy'], 
 		# pets => ['Dog', 'Hamster', 'Cat'] )
-	
+
 	%list = $mvh->fetch_first();  # want all keys, first values of each
 		# returns ( name => 'John', age => 18, color => undef, 
 		# siblings => 'Laura', pets => 'Dog' )
-	
+
 	%list = $mvh->fetch_last();  # want all keys, last values of each
 		# returns ( name => 'John', age => 18, color => undef, 
 		# siblings => 'Tandy', pets => 'Cat' )
-	
+
 	%list = $mvh->fetch_last( ['name', 'siblings'] );  # want named keys only
 		# returns ( name => 'John', siblings => 'Tandy' )
-	
+
 	%list = $mvh->fetch_last( ['name', 'siblings'], 1 );  # want complement
 		# returns ( age => 18, color => undef, pets => 'Cat' )
-	
+
 	$mv3 = $mvh->clone();  # make a duplicate of myself
 	$mv4 = $mvh->fetch_mvh( 'pets', 1 );  # leave out the pets in this "clone"
-	
+
 	@list = $mv3->keys();
 		# returns ('name','age','color','siblings','pets')
 	$num = $mv3->keys();  # whoops, doesn't do what we expect; returns array ref
 	$num = $mv3->keys_count();  # returns 5
-	
+
 	@list = $mv3->values();
 		# returns ( 'John', 18, 'Laura', 'Andrew', 'Julia', 'Tandy', 
 		# 'Dog', 'Hamster', 'Cat' )
 	@num = $mv3->values_count();  # returns 9
-	
+
 	@list = $mvh->splice( 'Siblings', 2, 1, ['James'] );
 	# replaces 'Julia' with 'James'; returns ( 'Julia' )
 
@@ -112,10 +115,10 @@ $VERSION = '1.08';
 		songs => ['this', 'that', 'and the other'],
 		pets => 'Fish',
 	} );  # adds key 'songs' with values, replaces list of pets with 'fish'
-	
+
 	$mv3->store_value( 'pets', 'turtle' );  # replaces 'fish' with 'turtle'
 	$mv3->store_value( 'pets', 'rabbit', 1 );  # pets is now ['turtle','rabbit']
-	
+
 	$oldval = $mv3->delete( 'color' );  # gets rid of color for good
 	$rdump = $mv3->delete_all();  # return everything as hash of arrays, clear
 
@@ -263,7 +266,7 @@ sub clone {
 		CORE::keys %{$rh_main_hash} };
 
 	$clone->{$KEY_CASE_INSE} = $self->{$KEY_CASE_INSE};
-	
+
 	return( $clone );
 }
 
@@ -830,7 +833,7 @@ sub _reduce_hash_to_subset {    # meant only for internal use
 		UNIVERSAL::isa($ra_keys,'Data::MultiValuedHash') ? $ra_keys->keys() : 
 		(ref($ra_keys) ne 'ARRAY') ? [$ra_keys] : $ra_keys;
 	my $case_inse = $self->{$KEY_CASE_INSE};
-	my %spec_keys = map { ( $case_inse ? lc($_) : $_ => 1 ) } @{$ra_keys};	
+	my %spec_keys = map { ( $case_inse ? lc($_) : $_ => 1 ) } @{$ra_keys};
 	if( CORE::shift( @_ ) ) {   # want complement of keys list
 		%{$rh_hash_copy} = map { !$spec_keys{$_} ? 
 			($_ => $rh_hash_copy->{$_}) : () } CORE::keys %{$rh_hash_copy};
@@ -892,7 +895,7 @@ fetch methods.
 	scalar = pop( KEY )
 
 	scalar = shift( KEY )
-	
+
 	array = splice( KEY, OFFSET, LENGTH, VALUES )
 
 	array = delete( KEY )
@@ -900,16 +903,21 @@ fetch methods.
 
 =head1 AUTHOR
 
-Copyright (c) 1999-2002, Darren R. Duncan. All rights reserved. This module is
-free software; you can redistribute it and/or modify it under the same terms as
-Perl itself.  However, I do request that this copyright information remain
-attached to the file.  If you modify this module and redistribute a changed
-version then please attach a note listing the modifications.
+Copyright (c) 1999-2003, Darren R. Duncan.  All rights reserved.  This module
+is free software; you can redistribute it and/or modify it under the same terms
+as Perl itself.  However, I do request that this copyright information and
+credits remain attached to the file.  If you modify this module and
+redistribute a changed version then please attach a note listing the
+modifications.  This module is available "as-is" and the author can not be held
+accountable for any problems resulting from its use.
 
 I am always interested in knowing how my work helps others, so if you put this
-module to use in any of your own code then please send me the URL. Also, if you
-make modifications to the module because it doesn't work the way you need, please
-send me a copy so that I can roll desirable changes into the main release.
+module to use in any of your own products or services then I would appreciate
+(but not require) it if you send me the website url for said product or
+service, so I know who you are.  Also, if you make non-proprietary changes to
+the module because it doesn't work the way you need, and you are willing to
+make these freely available, then please send me a copy so that I can roll
+desirable changes into the main release.
 
 Address comments, suggestions, and bug reports to B<perl@DarrenDuncan.net>.
 

@@ -1,6 +1,6 @@
 ChangeLog
+lib/Data/MultiValuedHash.pm
 Makefile.PL
 MANIFEST
-MultiValuedHash.pm
 ReadMe
-test.pl
+t/Data-MultiValuedHash.t

@@ -1,5 +1,5 @@
 # Before `make install' is performed this script should be runnable with
-# `make test'. After `make install' it should work as `perl test.pl'
+# `make test'. After `make install' it should work as `perl t/Data-MultiValuedHash.t'
 
 ######################### We start with some black magic to print on failure.
 
@@ -8,13 +8,14 @@
 
 BEGIN { $| = 1; print "1..221\n"; }
 END {print "not ok 1\n" unless $loaded;}
-use Data::MultiValuedHash 1.08;
+use Data::MultiValuedHash 1.081;
 $loaded = 1;
 print "ok 1\n";
 use strict;
+use warnings;
 
 # Set this to 1 to see complete result text for each test
-my $verbose = 0;
+my $verbose = shift( @ARGV ) ? 1 : 0;  # set from command line
 
 ######################### End of black magic.
 
